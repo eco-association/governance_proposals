@@ -1,4 +1,5 @@
 # Trustee Payout Test
+// TODO: FIX README
 
 To start up the enviroment, run:
 
@@ -26,6 +27,8 @@ To test, run:
 ```
 forge test
 ```
+
+##For the Trustee Payout Proposal 
 
 To run the script to run the proposal deploymeny to Tenderly, please run:
 ```
