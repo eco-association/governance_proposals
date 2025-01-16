@@ -2,7 +2,6 @@ import {Proposal} from "currency-1.5/governance/community/proposals/Proposal.sol
 import {ECOx} from "currency-1.5/currency/ECOx.sol";
 import {TrustedNodes} from "currency-1.5/governance/monetary/TrustedNodes.sol";
 
-
 contract TrusteePayout is Proposal {
     
     address[] public recipients;

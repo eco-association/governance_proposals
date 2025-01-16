@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {ECOx} from "currency-1.5/currency/ECOx.sol";
 import {Policy} from "currency-1.5/policy/Policy.sol";
 import {TrustedNodes} from "currency-1.5/governance/monetary/TrustedNodes.sol";
-import "./../src/TrusteePayout.sol";
+import "./../../src/1_Trustee_Payout/TrusteePayout.sol";
 import "forge-std/Script.sol";
 
 contract Deploy is Script {

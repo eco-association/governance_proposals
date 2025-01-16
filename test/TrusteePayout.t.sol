@@ -2,7 +2,7 @@ import {Test} from "forge-std/Test.sol";
 import {ECOx} from "currency-1.5/currency/ECOx.sol";
 import {Policy} from "currency-1.5/policy/Policy.sol";
 import {TrustedNodes} from "currency-1.5/governance/monetary/TrustedNodes.sol";
-import "./../src/TrusteePayout.sol";
+import "./../src/1_Trustee_Payout/TrusteePayout.sol";
 import "forge-std/console.sol";
 
 contract ForkTest is Test {
@@ -26,7 +26,7 @@ contract ForkTest is Test {
     uint256[] public payouts;
 
     function setUp() public {
-        mainnetFork = vm.createSelectFork(MAINNET_RPC_URL);
+        mainnetFork = vm.createSelectFork(MAINNET_RPC_URL, 21021900);
 
         // Trustees
         recipients= [
