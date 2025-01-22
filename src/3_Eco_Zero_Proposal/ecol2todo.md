@@ -1,0 +1,4 @@
+- make new eco contract for l2
+- pass message to l2
+- write l2 tests with mocks
+- deploy on tenderly and test both chains

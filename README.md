@@ -5,7 +5,7 @@ To start up the enviroment, run:
 forge install
 ```
 
-There may be an issue with the libraries not being found in the `currency-1.5` git submodule. If this occurs, run:
+There may be an issue with the libraries not being found in the `currency-1.5` or `op-eco` git submodule. If this occurs, run:
 
 ```
 cd lib/currency-1.5
@@ -15,7 +15,9 @@ cd lib/op-eco
 yarn install
 cd -
 forge remappings > remappings.txt
+echo '@openzeppelin-op-eco/=lib/op-eco/node_modules/@openzeppelin/' >> remappings.txt
 ```
+The final echo is because of an issue where forge remappings don't pick up the op-eco openzeppelin library because of namespace conflict. 
 
 To build, run:
 
