@@ -32,6 +32,10 @@ contract ForkTest is Test {
     }
 
     function testCurrencyGovernanceCanPass() public {
+        // check the Eco token name and symbol
+        assertEq(eco.name(), "ECO");
+        assertEq(eco.symbol(), "ECO");
+
         // check that the active fork is mainnet
         assertEq(vm.activeFork(), mainnetFork);
 
@@ -56,6 +60,12 @@ contract ForkTest is Test {
         // enact the proposal
         vm.prank(securityCouncil);
         policy.enact(address(proposal));
+
+        // check the name and symbol of the Eco token
+        assertEq(eco.name(), "0xdead");
+        assertEq(eco.symbol(), "0xdead");
+
+        console.log("new eco name and symbol", eco.name(), eco.symbol());
 
         // check the balance of the previous multisig
         assertEq(eco.balanceOf(previousMultisig), 0);
@@ -87,7 +97,11 @@ contract ForkTest is Test {
         // check if you can burn lp tokens to get back eco and usdc
         assertEq(ecoPair.balanceOf(address(ecoPairLP)), 5247691049867031287); // 
         vm.prank(address(ecoPair));
+
+        // this should revert with "UniswapV2: INSUFFICIENT_LIQUIDITY_BURNED"
+        vm.expectRevert("UniswapV2: INSUFFICIENT_LIQUIDITY_BURNED");
         ecoPair.burn(address(ecoPairLP));
+        
         assertEq(eco.balanceOf(address(ecoPairLP)), 0);
     }
 }
