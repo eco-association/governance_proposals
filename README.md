@@ -13,6 +13,9 @@ There may be an issue with the libraries not being found in the `currency-1.5` g
 cd lib/currency-1.5
 yarn install
 cd -
+cd lib/op-eco
+yarn install
+cd -
 forge remappings > remappings.txt
 ```
 
@@ -28,7 +31,7 @@ To test, run:
 forge test
 ```
 
-##For the Trustee Payout Proposal 
+### For the Trustee Payout Proposal 
 
 To run the script to run the proposal deploymeny to Tenderly, please run:
 ```
