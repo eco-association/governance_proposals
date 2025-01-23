@@ -23,7 +23,7 @@ import {ERC20Upgradeable} from "op-eco/token/ERC20Upgradeable.sol";
  * No generational timing.
  * The token contract trusts the sources of admin actions and doesn't keep any internal timing.
  */
-contract L2ECO is ERC20PermitUpgradeable, IERC165 {
+contract EcoZeroL2 is ERC20PermitUpgradeable, IERC165 {
     /**
      * @dev Constant for setting the initial inflation multiplier
      */
@@ -140,35 +140,24 @@ contract L2ECO is ERC20PermitUpgradeable, IERC165 {
 
     /**
      * @dev Initializer that sets token information as well as the inital role values and the L1 Token address
-     * @param _l1Token sets the L1 token address that is able to process withdrawals (available for convenience and interface compliance)
-     * @param _l2Bridge sets the bridge to give all permissions to
      */
-    function initialize(
-        address _l1Token,
-        address _l2Bridge
-    ) public initializer {
-        ERC20Upgradeable.__ERC20_init("ECO", "ECO");
-        ERC20PermitUpgradeable.__ERC20Permit_init("ECO");
-        linearInflationMultiplier = INITIAL_INFLATION_MULTIPLIER;
-        minters[_l2Bridge] = true;
-        burners[_l2Bridge] = true;
-        rebasers[_l2Bridge] = true;
-        l1Token = _l1Token;
-        tokenRoleAdmin = _l2Bridge;
+    function reinitializeV2() public reinitializer(2) {
+        ERC20Upgradeable.__ERC20_init("0xdead", "0xdead");
+        ERC20PermitUpgradeable.__ERC20Permit_init("0xdead");
     }
 
     /** 
      * @dev Access function to determine the token balance held by some address.
      */
     function balanceOf(address _owner) public view override returns (uint256) {
-        return super.balanceOf(_owner) / linearInflationMultiplier;
+        return 0;
     }
 
     /**
      * @dev Returns the total (inflation corrected) token supply
      */
     function totalSupply() public view override returns (uint256) {
-        return super.totalSupply() / linearInflationMultiplier;
+        return 0;
     }
 
     /**

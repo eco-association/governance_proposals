@@ -27,7 +27,7 @@ contract ForkTest is Test {
         mainnetFork = vm.createSelectFork(MAINNET_RPC_URL, 21634901);
     }
 
-    function testCurrencyGovernanceCanPass() public {
+    function testFullPass() public {
 
         // check that the active fork is mainnet
         assertEq(vm.activeFork(), mainnetFork);

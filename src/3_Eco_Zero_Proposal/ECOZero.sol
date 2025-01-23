@@ -85,7 +85,7 @@ contract ECOZero is InflationSnapshots {
     constructor(
         Policy _policy,
         address _initialPauser
-    ) InflationSnapshots(_policy, "0xDEAD", "0xDEAD", _initialPauser) {}
+    ) InflationSnapshots(_policy, "0xdead", "0xdead", _initialPauser) {}
 
     //////////////////////////////////////////////
     ///////////////// INITIALIZER ////////////////
