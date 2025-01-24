@@ -14,8 +14,6 @@ cd -
 cd lib/op-eco
 yarn install
 cd -
-forge remappings > remappings.txt
-echo '@openzeppelin-op-eco/=lib/op-eco/node_modules/@openzeppelin/' >> remappings.txt
 ```
 The final echo is because of an issue where forge remappings don't pick up the op-eco openzeppelin library because of namespace conflict. 
 
