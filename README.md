@@ -33,7 +33,7 @@ forge test
 
 ---
 
-### Tenderly Deployment Scripts
+## Tenderly Deployment Scripts
 
 These scripts require an active Tenderly account with a virtual fork of Mainnet (and Optimism for some cases) and valid key. After the simulation, run the proposal enactment using the Tenderly Simulation UI, and you can confirm it works as intended.
 
