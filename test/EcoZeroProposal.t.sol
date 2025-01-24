@@ -8,6 +8,8 @@ import {L2ECOBridge} from "op-eco/bridge/L2ECOBridge.sol";
 import {IL1CrossDomainMessenger} from "@eth-optimism/contracts/L1/messaging/IL1CrossDomainMessenger.sol";
 import {IL2CrossDomainMessenger} from "@eth-optimism/contracts/L2/messaging/IL2CrossDomainMessenger.sol";
 import {L2ECO} from "op-eco/token/L2ECO.sol";
+import {AddressAliasHelper} from "@eth-optimism/contracts-bedrock/contracts/vendor/AddressAliasHelper.sol";
+import {Hashing} from "lib/op-eco/node_modules/@eth-optimism/contracts-bedrock/contracts/libraries/Hashing.sol";
 import "./../src/3_Eco_Zero_Proposal/EcoZero.sol";
 import "./../src/3_Eco_Zero_Proposal/EcoZeroL2.sol";
 import "./../src/3_Eco_Zero_Proposal/EcoZeroProposal.sol";
@@ -45,12 +47,22 @@ contract ForkTest is Test {
         L2ECOBridge(0xAa029BbdC947F5205fBa0F3C11b592420B58f824);
     L2ECO l2ECO = L2ECO(0xe7BC9b3A936F122f08AAC3b1fac3C3eC29A78874);
     EcoZeroL2 ecoZeroL2;
+    address constant ecoHolder = 0x6085e45604956A724556135747400e32a0D6603A;
+    uint256 constant minGasLimit = 10000;
 
     //events
     event UpgradeL2ECO(address proposal);
-    event SentMessage(address indexed target, address sender, bytes message, uint256 messageNonce, uint256 gasLimit);
+    event SentMessage(
+        address indexed target,
+        address sender,
+        bytes message,
+        uint256 messageNonce,
+        uint256 gasLimit
+    );
     event SentMessageExtension1(address indexed sender, uint256 value);
-
+    event RelayedMessage(bytes32 indexed msgHash);
+    event UpgradeECOImplementation(address _newEcoImpl);
+    event Upgraded(address indexed implementation);
 
     function setUp() public {
         optimismFork = vm.createSelectFork(OPTIMISM_RPC_URL, 131023758);
@@ -62,7 +74,7 @@ contract ForkTest is Test {
             address(ecoZeroL2),
             l1ECOBridge,
             eco,
-            10000
+            uint32(minGasLimit)
         );
     }
 
@@ -105,8 +117,6 @@ contract ForkTest is Test {
         // check the name and symbol of the Eco token
         assertEq(eco.name(), "0xdead");
         assertEq(eco.symbol(), "0xdead");
-
-        console.log("new eco name and symbol", eco.name(), eco.symbol());
 
         // check the balance of the previous multisig
         assertEq(eco.balanceOf(previousMultisig), 0);
@@ -156,34 +166,150 @@ contract ForkTest is Test {
             address(ecoZeroL2),
             block.number
         );
-        console.logBytes(message);
-        (bool success, bytes memory returnData) = address(l1Messenger).call(abi.encodeWithSignature("messageNonce()"));
+
+        (bool success, bytes memory returnData) = address(l1Messenger).call(
+            abi.encodeWithSignature("messageNonce()")
+        );
         require(success, "call to messageNonce() failed");
         uint256 currentNonce = abi.decode(returnData, (uint256));
 
         vm.expectEmit(true, false, false, true, address(l1Messenger));
-        emit SentMessage(address(l2ECOBridge), address(l1ECOBridge), message, currentNonce, 10000);
+        emit SentMessage(
+            address(l2ECOBridge),
+            address(l1ECOBridge),
+            message,
+            currentNonce,
+            minGasLimit
+        );
 
         // should emit SentMessageExtension1(msg.sender, msg.value);
         vm.expectEmit(true, false, false, true, address(l1Messenger));
         emit SentMessageExtension1(address(l1ECOBridge), 0);
-        
+
         // should emit UpgradeL2ECO(_impl);
         vm.expectEmit(address(l1ECOBridge));
         emit UpgradeL2ECO(address(ecoZeroL2));
 
-        // should call CrossDomainMessenger.sendMessage 
+        // should call CrossDomainMessenger.sendMessage
         bytes memory data = abi.encodeWithSelector(
             l1Messenger.sendMessage.selector,
             address(l2ECOBridge),
             message,
-            10000
+            minGasLimit
         );
         vm.expectCall(address(l1Messenger), data);
-
 
         //enact the proposal
         vm.prank(securityCouncil);
         policy.enact(address(proposal));
+    }
+
+    function testEcoReplacementL2() public {
+        // check that the active fork is mainnet
+        assertEq(vm.activeFork(), mainnetFork);
+
+        uint32 getBlock = uint32(block.number);
+
+        //construct the message
+        bytes memory message = abi.encodeWithSelector(
+            L2ECOBridge.upgradeECO.selector,
+            address(ecoZeroL2),
+            getBlock
+        );
+
+        //get the nonce
+        (bool success, bytes memory returnData) = address(l1Messenger).call(
+            abi.encodeWithSignature("messageNonce()")
+        );
+        require(success, "call to messageNonce() failed");
+        uint256 currentNonce = abi.decode(returnData, (uint256));
+
+        // select optimism fork
+        vm.selectFork(optimismFork);
+
+        // check that the active fork is optimism
+        assertEq(vm.activeFork(), optimismFork);
+
+        // check the Eco token name and symbol
+        assertEq(l2ECO.name(), "ECO");
+        assertEq(l2ECO.symbol(), "ECO");
+
+        // check the balance of the eco holder
+        assertEq(l2ECO.balanceOf(ecoHolder), 3392770625329999699652659);
+
+        // check the total supply
+        assertEq(l2ECO.totalSupply(), 22314543710041285166435565);
+
+        // convert L1 messenger to L2 aliased messenger address
+        address aliasedL1Caller = AddressAliasHelper.applyL1ToL2Alias(
+            address(l1Messenger)
+        );
+
+        // should emit relayedMessage(msgHash)
+        bytes32 msgHash = Hashing.hashCrossDomainMessage(
+            currentNonce,
+            address(l1ECOBridge),
+            address(l2ECOBridge),
+            0,
+            minGasLimit,
+            message
+        );
+
+        vm.expectEmit(true, false, false, false, address(l2ECO));
+        emit Upgraded(address(ecoZeroL2));
+
+        vm.expectEmit(false, false, false, true, address(l2ECOBridge));
+        emit UpgradeECOImplementation(address(ecoZeroL2));
+
+        vm.expectEmit(true, false, false, false, address(l2Messenger));
+        emit RelayedMessage(msgHash);
+
+        // should call l2ECOBridge.upgradeECO
+        bytes memory data = abi.encodeWithSelector(
+            l2ECOBridge.upgradeECO.selector,
+            address(ecoZeroL2),
+            getBlock
+        );
+        vm.expectCall(address(l2ECOBridge), data);
+
+        // enact the proposal via mock L2MessengerCall with direct call (Bedrock Issue)
+        vm.prank(aliasedL1Caller);
+        address(l2Messenger).call(
+            abi.encodeWithSignature(
+                "relayMessage(uint256,address,address,uint256,uint256,bytes)",
+                currentNonce,
+                address(l1ECOBridge),
+                address(l2ECOBridge),
+                0,
+                minGasLimit,
+                message
+            )
+        );
+
+        // shadow post upgrade
+        EcoZeroL2 l2ECO = EcoZeroL2(0xe7BC9b3A936F122f08AAC3b1fac3C3eC29A78874);
+
+        // check the name and symbol of the Eco token
+        // should not be upgraded because not initalized yet
+        assertEq(l2ECO.name(), "ECO");
+        assertEq(l2ECO.symbol(), "ECO");
+
+        // check the balance of the eco holder
+        assertEq(l2ECO.balanceOf(ecoHolder), 0);
+
+        // check the total supply
+        assertEq(l2ECO.totalSupply(), 0);
+
+        // initailize the ecoZeroL2 contract
+        l2ECO.reinitializeV2();
+
+        // check the name and symbol of the Eco token
+        assertEq(l2ECO.name(), "0xdead");
+        assertEq(l2ECO.symbol(), "0xdead");
+
+        // make sure you can't reinitialize the contract
+        vm.expectRevert("Initializable: contract is already initialized");
+        l2ECO.reinitializeV2();
+
     }
 }
