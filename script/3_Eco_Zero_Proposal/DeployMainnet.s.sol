@@ -22,7 +22,10 @@ contract DeployMainnet is Script {
     uint32 l2gas = 40000;
 
     function run(address _ecoZeroL2) public {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+
         ecoZeroL2 = _ecoZeroL2;
+        vm.startBroadcast(deployerPrivateKey);
         ecoZero = new ECOZero(policy, securityCouncil);
         EcoZeroProposal ecoZeroProposal = new EcoZeroProposal(
             address(ecoZero),
@@ -31,6 +34,7 @@ contract DeployMainnet is Script {
             eco,
             l2gas
         );
+        vm.stopBroadcast();
 
     }
 }
