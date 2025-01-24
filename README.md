@@ -17,8 +17,6 @@ yarn install
 cd -
 ```
 
-The final echo is because of an issue where forge remappings don't pick up the op-eco openzeppelin library because of namespace conflict.
-
 To build, run:
 
 ```sh
@@ -78,3 +76,5 @@ forge script script/3_Eco_Zero_Proposal/DeployMainnet.s.sol:DeployMainnet \
 
 unset address
 ```
+
+This script deploys to Optimism and then takes the L2EcoZero proposal address for the L1 EcoZeroProposal. 
