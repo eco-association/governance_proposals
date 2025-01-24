@@ -1,25 +1,36 @@
 pragma solidity ^0.8.0;
 
 import {ECO} from "currency-1.5/currency/ECO.sol";
-import {EcoZeroProposal} from "src/3_Eco_Zero_Proposal/EcoZeroProposal.sol";
-import {EcoZeroL2} from "src/3_Eco_Zero_Proposal/EcoZeroL2.sol";
+import {EcoZeroProposal} from "../../src/3_Eco_Zero_Proposal/EcoZeroProposal.sol";
+import {ECOZero} from "../../src/3_Eco_Zero_Proposal/EcoZero.sol";
+import {L1ECOBridge} from "op-eco/bridge/L1ECOBridge.sol";
+import {Policy} from "currency-1.5/policy/Policy.sol";
+
 import "forge-std/Script.sol";
 
 contract DeployMainnet is Script {
-    ECO eco = ECO(0x8dBF9A4c99580fC7Fd4024ee08f3994420035727);
+    // proposal, policy and council
     address securityCouncil = 0xCF2A6B4bc14A1FEf0862c9583b61B1beeDE980C2;
+    Policy policy = Policy(0x8c02D4cc62F79AcEB652321a9f8988c0f6E71E68);
     EcoZeroProposal proposal; 
-    EcoZeroL2 ecoZeroL2;
 
-            address _newECOImpl,
-        address _newL2ECOImpl,
-        L1ECOBridge _l1ECOBridge,
-        ECO _eco,
-        uint32 _l2gas
+    // proposal constructor
+    ECOZero ecoZero;
+    address ecoZeroL2; 
+    L1ECOBridge l1ECOBridge = L1ECOBridge(0xAa029BbdC947F5205fBa0F3C11b592420B58f824);
+    ECO eco = ECO(0x8dBF9A4c99580fC7Fd4024ee08f3994420035727);
+    uint32 l2gas = 40000;
 
-    function run() public override {
-        ECO eco = new ECO();
-        EcoZeroProposal ecoZeroProposal = new EcoZeroProposal(eco);
-        EcoZeroL2 ecoZeroL2 = new EcoZeroL2(ecoZeroProposal);
+    function run(address _ecoZeroL2) public {
+        ecoZeroL2 = _ecoZeroL2;
+        ecoZero = new ECOZero(policy, securityCouncil);
+        EcoZeroProposal ecoZeroProposal = new EcoZeroProposal(
+            address(ecoZero),
+            ecoZeroL2,
+            l1ECOBridge,
+            eco,
+            l2gas
+        );
+
     }
 }
