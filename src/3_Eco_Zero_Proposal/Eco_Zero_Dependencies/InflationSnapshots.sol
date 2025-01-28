@@ -1,7 +1,7 @@
 /* -*- c-basic-offset: 4 -*- */
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import "currency-1.5/currency/VoteSnapshots.sol";
+import "./VoteSnapshots.sol";
 
 /**
  * @title InflationSnapshots
@@ -142,7 +142,7 @@ abstract contract InflationSnapshots is VoteSnapshots {
      */
     function balanceOf(
         address _owner
-    ) public view override returns (uint256 inflationBalance) {
+    ) public pure override returns (uint256 inflationBalance) {
         return 0;
     }
 
@@ -153,7 +153,7 @@ abstract contract InflationSnapshots is VoteSnapshots {
      */
     function voteBalanceOf(
         address _owner
-    ) public view override returns (uint256 votingBalance) {
+    ) public pure override returns (uint256 votingBalance) {
         return 0;
     }
 
@@ -163,7 +163,7 @@ abstract contract InflationSnapshots is VoteSnapshots {
      */
     function totalSupply()
         public
-        view
+        pure
         override
         returns (uint256 totalInflatedSupply)
     {
@@ -176,7 +176,7 @@ abstract contract InflationSnapshots is VoteSnapshots {
      */
     function totalSupplySnapshot()
         public
-        view
+        pure
         override
         returns (uint256 totalInflatedSupply)
     {

@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./InflationSnapshots.sol";
-import "currency-1.5/governance/monetary/CurrencyGovernance.sol";
+import "./Eco_Zero_Dependencies/InflationSnapshots.sol";
 
 /**
  * @title An ERC20 token interface to the Eco currency system.

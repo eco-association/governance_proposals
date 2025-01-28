@@ -1,3 +1,5 @@
+pragma solidity ^0.8.0;
+
 import {Test} from "forge-std/Test.sol";
 import {ECOx} from "currency-1.5/currency/ECOx.sol";
 import {ECO} from "currency-1.5/currency/ECO.sol";
