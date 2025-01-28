@@ -149,14 +149,16 @@ contract EcoZeroL2 is ERC20PermitUpgradeable, IERC165 {
     /** 
      * @dev Access function to determine the token balance held by some address.
      */
-    function balanceOf(address _owner) public view override returns (uint256) {
+
+    function balanceOf(address _owner) public pure override returns (uint256) {
         return 0;
     }
 
     /**
      * @dev Returns the total (inflation corrected) token supply
      */
-    function totalSupply() public view override returns (uint256) {
+    
+    function totalSupply() public pure override returns (uint256) {
         return 0;
     }
 
@@ -280,6 +282,8 @@ contract EcoZeroL2 is ERC20PermitUpgradeable, IERC165 {
         address to,
         uint256 amount
     ) internal virtual override returns(uint256) {
+        require(from == address(0), "this token is 0xdead");
+
         amount = super._beforeTokenTransfer(from, to, amount);
         // overwrite for efficiency
         amount = amount * linearInflationMultiplier;

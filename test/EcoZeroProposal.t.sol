@@ -1,6 +1,9 @@
+pragma solidity ^0.8.0;
+
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
 import {ECO} from "currency-1.5/currency/ECO.sol";
+import {ECOx} from "currency-1.5/currency/ECOx.sol";
 import {L2ECO} from "op-eco/token/L2ECO.sol";
 import {Policy} from "currency-1.5/policy/Policy.sol";
 import {L1ECOBridge} from "op-eco/bridge/L1ECOBridge.sol";
@@ -14,6 +17,7 @@ import "./../src/3_Eco_Zero_Proposal/EcoZero.sol";
 import "./../src/3_Eco_Zero_Proposal/EcoZeroL2.sol";
 import "./../src/3_Eco_Zero_Proposal/EcoZeroProposal.sol";
 import "./utils/UniswapV2Pair.sol";
+import "./utils/IClaimContract.sol";
 
 contract ForkTest is Test {
     uint256 mainnetFork;
@@ -27,6 +31,7 @@ contract ForkTest is Test {
     address constant previousMultisig =
         0x99f98ea4A883DB4692Fa317070F4ad2dC94b05CE;
     ECO eco = ECO(0x8dBF9A4c99580fC7Fd4024ee08f3994420035727);
+    ECOx ecox = ECOx(0xcccD1Ba9f7acD6117834E0D28F25645dECb1736a);
     Policy policy = Policy(0x8c02D4cc62F79AcEB652321a9f8988c0f6E71E68);
     L1ECOBridge l1ECOBridge =
         L1ECOBridge(0xAa029BbdC947F5205fBa0F3C11b592420B58f824);
@@ -39,6 +44,8 @@ contract ForkTest is Test {
     IUniswapV2Pair ecoPair =
         IUniswapV2Pair(0x09bC52B9EB7387ede639Fc10Ce5Fa01CBCBf2b17);
     address constant ecoPairLP = 0x26bF0495fE1c40256fE9F72278724fac538B9828;
+    IClaimContract claim = IClaimContract(0xa28f219BF1e15f5217B8Eb5f406BcbE8f13d16DC);
+    address constant unclaimed = 0xF2c06f90FB58844C09220e01E3116A2293Df6960;
 
     //L2 contracts
     IL2CrossDomainMessenger l2Messenger =
@@ -154,6 +161,26 @@ contract ForkTest is Test {
         ecoPair.burn(address(ecoPairLP));
 
         assertEq(eco.balanceOf(address(ecoPairLP)), 0);
+
+        // check that no one can send tokens
+        vm.prank(address(previousMultisig));
+        vm.expectRevert("this token is 0xdead");
+        eco.transfer(address(securityCouncil), 1000);
+
+        // check that the claim contract can send tokens even if it does nothing
+        vm.prank(address(claim));
+        eco.transfer(address(securityCouncil), 1000);
+
+        // check that balance is still zero
+        assertEq(eco.balanceOf(address(securityCouncil)),0);
+
+        // check that someone can claim second token claim
+        uint256 ecoxBalance = ecox.balanceOf(address(unclaimed));
+        vm.prank(address(unclaimed));
+        claim.releaseTokens('discord:391766896195928065');
+        assertEq(ecox.balanceOf(unclaimed), ecoxBalance + 315500000000000000000*7);
+
+
     }
 
     function testEcoReplacementL1Message() public {
@@ -310,6 +337,11 @@ contract ForkTest is Test {
         // make sure you can't reinitialize the contract
         vm.expectRevert("Initializable: contract is already initialized");
         l2ECO.reinitializeV2();
+
+        //check that no one can send tokens
+        vm.prank(address(ecoHolder));
+        vm.expectRevert("this token is 0xdead");
+        l2ECO.transfer(address(ecoHolder), 1000);
 
     }
 }
