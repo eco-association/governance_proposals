@@ -26,7 +26,7 @@ contract TrusteePayout2 is Proposal {
     }
 
     function name() public pure virtual override returns (string memory) {
-        return "Trustee Payout Proposal";
+        return "Trustee Payout Proposal 2";
     }
 
     function description()
@@ -37,7 +37,7 @@ contract TrusteePayout2 is Proposal {
         returns (string memory)
     {
         return
-            "Pays out Trustees for their first term due to a smart contract bug";
+            "Pays out Trustees for their second term due to a smart contract bug";
     }
 
     /** A URL where more details can be found.
