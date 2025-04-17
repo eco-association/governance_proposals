@@ -19,7 +19,7 @@ contract DeployMainnet is Script {
     address ecoZeroL2; 
     L1ECOBridge l1ECOBridge = L1ECOBridge(0xAa029BbdC947F5205fBa0F3C11b592420B58f824);
     ECO eco = ECO(0x8dBF9A4c99580fC7Fd4024ee08f3994420035727);
-    uint32 l2gas = 40000;
+    uint32 l2gas = 400000;
 
     function run(address _ecoZeroL2) public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
