@@ -3,8 +3,10 @@ src = "src"
 out = "out"
 libs = ["lib"]
 fs_permissions = [
-    { access = "read", path = "./script/addresses.json" },
-    { access = "read", path = "./script/payouts.json" }
+    { access = "read", path = "./script/1_Trustee_Payout/addresses.json" },
+    { access = "read", path = "./script/1_Trustee_Payout/payouts.json" },
+    { access = "read", path = "./script/4_Trustee_Payout_2/addresses.json" },
+    { access = "read", path = "./script/4_Trustee_Payout_2/payouts.json" }
 ]
 auto_detect_solc = true
 

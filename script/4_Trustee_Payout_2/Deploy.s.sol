@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {ECOx} from "currency-1.5/currency/ECOx.sol";
 import {Policy} from "currency-1.5/policy/Policy.sol";
 import {TrustedNodes} from "currency-1.5/governance/monetary/TrustedNodes.sol";
-import "./../../src/1_Trustee_Payout/TrusteePayout.sol";
+import "./../../src/4_Trustee_Payout_2/TrusteePayout2.sol";
 import "forge-std/Script.sol";
 
 contract Deploy is Script {
@@ -12,12 +12,12 @@ contract Deploy is Script {
     Policy policy = Policy(0x8c02D4cc62F79AcEB652321a9f8988c0f6E71E68);
     address constant currencyGovernance = 0x039F39846C6F9911993809C7488eF4502208cE4B; 
     address constant trustedNodes = 0x9fA130E9d1dA166164381F6d1de8660da0afc1f1;
-    TrusteePayout proposal; 
+    TrusteePayout2 proposal; 
 
     function run() public {
             // read and decode the JSON file for addresses
-    string memory json_addresses = vm.readFile("script/addresses.json");
-    string memory json_rec = vm.readFile("script/payouts.json");
+    string memory json_addresses = vm.readFile("script/4_Trustee_Payout_2/addresses.json"); 
+    string memory json_rec = vm.readFile("script/4_Trustee_Payout_2/payouts.json");
 
     address[] memory recipients = abi.decode(vm.parseJson(json_addresses, ".addresses"), (address[]));
     uint256[] memory payouts = abi.decode(vm.parseJson(json_rec, ".payouts"), (uint256[]));
@@ -33,7 +33,7 @@ contract Deploy is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        proposal = new TrusteePayout(recipients, payouts, ecox, trustedNodes);
+        proposal = new TrusteePayout2(recipients, payouts, ecox, trustedNodes);
 
         vm.stopBroadcast();
     }

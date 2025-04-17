@@ -77,4 +77,14 @@ forge script script/3_Eco_Zero_Proposal/DeployMainnet.s.sol:DeployMainnet \
 unset address
 ```
 
-This script deploys to Optimism and then takes the L2EcoZero proposal address for the L1 EcoZeroProposal. 
+This script deploys to Optimism and then takes the L2EcoZero proposal address for the L1 EcoZeroProposal.
+
+#### 4) For the Trustee Payout Proposal 2
+
+To run the script to run the proposal deploymeny to Tenderly, please run:
+
+```sh
+forge script script/4_Trustee_Payout_2/Deploy.s.sol:Deploy --chain-id 1 --rpc-url $TENDERLY_VIRTUAL_FORK --etherscan-api-key $TENDERLY_ACCESS_KEY --verifier-url $TENDERLY_VERIFIER_URL --broadcast --verify -vvvv
+```
+
+This script deploys to a Tenderly fork of Mainnet.

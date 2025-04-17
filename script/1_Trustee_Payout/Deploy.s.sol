@@ -16,8 +16,8 @@ contract Deploy is Script {
 
     function run() public {
             // read and decode the JSON file for addresses
-    string memory json_addresses = vm.readFile("script/addresses.json");
-    string memory json_rec = vm.readFile("script/payouts.json");
+    string memory json_addresses = vm.readFile("script/1_Trustee_Payout/addresses.json");
+    string memory json_rec = vm.readFile("script/1_Trustee_Payout/payouts.json");
 
     address[] memory recipients = abi.decode(vm.parseJson(json_addresses, ".addresses"), (address[]));
     uint256[] memory payouts = abi.decode(vm.parseJson(json_rec, ".payouts"), (uint256[]));
